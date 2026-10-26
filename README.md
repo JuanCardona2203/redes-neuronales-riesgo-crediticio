@@ -169,6 +169,7 @@ Supongamos un cliente con entradas normalizadas $\mathbf{x} = [0.25, 0.40, 0.30,
  ┌──────────────┐
  │ Capa Salida  │  (1 Neurona + Activation Sigmoid) ──► Output: P(Mora) ∈ [0, 1]
  └──────────────┘
+```
 
 ## 7. Forward Propagation (Paso Hacia Adelante)
 
