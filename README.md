@@ -1,108 +1,132 @@
 # Predicción de Riesgo Crediticio mediante Redes Neuronales (MLP)
 
-**Presentado por:** 
----
-
-Yenifer Salazar Restrepo
-
-Juan Esteban Cardona
-
-Camilo Andrés Estrada Sosa
-
----
-
-## 1. Descripción del Proyecto
-Este proyecto implementa un modelo de Inteligencia Artificial basado en una Red Neuronal Densa (Perceptrón Multicapa - MLP) para la clasificación probabilística del riesgo de morosidad a más de 90 días en solicitudes de crédito de consumo bancario.
+| Dato | Registro del Estudiante / Proyecto |
+| :--- | :--- |
+| **Estudiante / equipo** | Yenifer Salazar Restrepo - Juan Esteban Cardona Jaramillo - Camilo Andrés Estrada Sosa |
+| **Programa / área** | Ingeniería / Ciencia de Datos / Redes Neuronales |
+| **Proyecto** | Clasificación de Riesgo Crediticio y Predicción de Mora con Perceptrón Multicapa (MLP) |
+| **Docente** | Docente Titular de Redes Neuronales |
+| **Línea / semillero / investigación** | Inteligencia Computacional y Analítica Financiera |
+| **Versión / fecha** | v1.0 — Octubre 2026 |
+| **Repositorio / evidencia** | [GitHub - redes-neuronales-riesgo-crediticio](https://github.com/JuanCardona2203/redes-neuronales-riesgo-crediticio) |
+| **Estado** | Implementación / Validación (Fases 1 a 10) |
 
 ---
 
-## 2. Definición del Problema y Justificación
+## Propósito del Proyecto
+Transformar la evaluación de riesgo crediticio en un modelo reproducible de aprendizaje profundo, partiendo desde los fundamentos matemáticos de la neurona artificial hasta el diseño, propagación hacia adelante, optimización y entrenamiento de un Perceptrón Multicapa (MLP).
 
-### Contexto del Problema
-El departamento de riesgos bancarios requiere automatizar la evaluación crediticia. Los modelos lineales tradicionales presentan limitaciones al capturar interacciones no lineales entre los ingresos del cliente, su índice de endeudamiento y su comportamiento histórico de pagos.
+---
+
+## 1. Definición del Problema
 
 | Elemento | Registro del Proyecto |
 | :--- | :--- |
-| **Contexto** | Evaluación de solicitudes de crédito de consumo. |
-| **Problema observable** | Incremento en la tasa de morosidad (>90 días) por clasificaciones imprecisas. |
-| **A quién impacta** | Área de gestión de riesgo financiero y clientes solicitantes. |
-| **Decisión a mejorar** | Clasificación de aprobación vs. rechazo de créditos. |
-| **Oportunidad con RN** | Aprendizaje automático de fronteras de decisión no lineales complejas sin asumir distribuciones previas. |
+| **Contexto** | Evaluación de solicitudes de créditos de consumo en entidades financieras. |
+| **Problema observable** | Ineficiencia y tasa elevada de cartera vencida (>90 días) por modelos rígidos de aprobación. |
+| **Antecedentes** | Los scorecards tradicionales basados en sumatorias de puntos o regresión lineal no capturan interacciones complejas ni fronteras de decisión no lineales. |
+| **Causas** | Cambios en el perfil socioeconómico de los solicitantes e interacciones complejas entre el ingreso, la tasa y el sobreendeudamiento. |
+| **A quién impacta** | Al departamento de riesgos del banco (pérdidas de capital) y a los clientes solventes (rechazos injustificados). |
+| **Consecuencia** | Aumento de las provisiones por incobrabilidad y pérdida de competitividad en el mercado crediticio. |
+| **Decisión a mejorar** | Clasificación automática y probabilística sobre aprobar o denegar una solicitud de crédito. |
+| **Oportunidad con redes neuronales** | Capacidad del Perceptrón Multicapa (MLP) para aprender funciones no lineales continuas a partir de múltiples variables financieras. |
+| **Restricciones** | Mantenimiento estricto de la reproducibilidad, control de sesgos, ausencia de data leakage y normalización de entradas. |
 
-### Justificación Técnica
-* **Reglas de Negocio:** Rígidas e incapaces de adaptarse a nuevos patrones de comportamiento.
-* **Regresión Logística:** Asume linealidad en los datos, limitando la captura de patrones complejos.
-* **Red Neuronal (MLP):** Permite aproximar funciones no lineales complejas mediante capas ocultas y funciones de activación no lineales.
+### 1.1 Pregunta de Investigación
+¿En qué medida la implementación de un Perceptrón Multicapa (MLP) optimizado mediante el algoritmo Adam permite clasificar con mayor precisión la mora crediticia a 90 días en comparación con los enfoques estadísticos lineales convencionales?
 
----
+### 1.2 Justificación Técnica
 
-## 3. Objetivos e Indicadores (SMART)
-
-* **Objetivo General:** Diseñar, entrenar y evaluar un Perceptrón Multicapa (MLP) para clasificar el riesgo de mora a 90 días mediante un pipeline reproducible en GitHub.
-* **Objetivos Específicos:**
-  1. Preprocesar y escalar las variables financieras de entrada para asegurar la estabilidad del gradiente.
-  2. Construir la arquitectura de la red definiendo la cantidad de capas, funciones de activación, función de pérdida y algoritmo de optimización.
-  3. Validar la convergencia del entrenamiento reduciendo la función de pérdida (Binary Cross-Entropy).
-
-| Fase | Indicador | Meta | Evidencia |
+| Alternativa | Ventaja | Limitación | Razón para utilizar Red Neuronal |
 | :--- | :--- | :--- | :--- |
-| **Problema** | Documentación de contexto y justificación | 100% documentado | `README.md` |
-| **Datos** | Ausencia de nulos y escalamiento | 0% faltantes, datos escalados | `notebooks/01_datos.ipynb` |
-| **Arquitectura** | Compatibilidad de tensores | Verificación exitosa | `notebooks/04_architecture.ipynb` |
-| **Entrenamiento** | Convergencia del error | Pérdida en descenso continuo | `notebooks/06_training.ipynb` |
+| **Reglas de negocio** | Altamente interpretables y fáciles de implementar en sistemas legacy. | Estáticas, rígidas, incapacidad de adaptarse a nuevos patrones de fraude o mora. | La RN ajusta sus pesos automáticamente mediante datos históricos sin reglas manuales. |
+| **Regresión / estadística** | Modelos simples, bajo costo computacional, salida probabilística directa. | Asumen linealidad estricta e independencia entre variables explicativas. | La RN aprende combinaciones no lineales complejas entre el nivel de endeudamiento y la tasa. |
+| **ML convencional (Dec. Trees)** | Maneja bien datos tabulares y relaciones no lineales simples. | Propenso al sobreajuste si no se podan correctamente los árboles. | Sirve como baseline de referencia; el MLP permite construir representaciones internas más ricas. |
+| **Red Neuronal (MLP)** | Alta capacidad de aproximación universal de funciones no lineales. | Requiere ajuste riguroso de hiperparámetros y normalización cuidadosa. | **Seleccionada:** Ofrece la flexibilidad requerida para modelar fronteras de decisión complejas en riesgo financiero. |
 
 ---
 
-## 4. Datos y Variables de Entrada
+## 2. Objetivos e Indicadores
 
-El dataset utiliza datos tabulares sobre el perfil financiero del solicitante:
+### Objetivo General
+Diseñar, fundamentar e implementar una red neuronal densa (MLP) para predecir la probabilidad de incumplimiento de pago (mora a 90 días) utilizando el dataset *Credit Risk*, garantizando reproducibilidad técnica en GitHub.
 
-| Variable | Tipo | Descripción | Target |
-| :--- | :--- | :--- | :--- |
-| `Ingreso_mensual` | Numérica | Ingresos netos mensuales del cliente (Normalizado) | No |
-| `Indice_endeudamiento` | Numérica | Proporción de ingresos comprometidos en deudas | No |
-| `Numero_retrasos_previos` | Categórica / Entero | Historial de moras en los últimos 24 meses | No |
-| `Antiguedad_cliente_meses` | Numérica | Tiempo de permanencia del cliente en la entidad | No |
-| `Mora_90_dias` | Binaria (0 / 1) | **Target:** 1 = Entra en mora, 0 = Paga a tiempo | **Sí** |
+### Objetivos Específicos
+1. **Preprocesamiento:** Limpiar, imputar y escalar min-max/estándar las variables financieras de entrada para garantizar la estabilidad de los gradientes.
+2. **Modelado y Arquitectura:** Estructurar un MLP definiendo capas densas, funciones de activación (ReLU/Sigmoid), función de pérdida (*Binary Cross-Entropy*) y optimizador (*Adam*).
+3. **Optimización y Validación:** Ejecutar experimentos de entrenamiento verificando matemáticamente el *Forward Pass*, la reducción del error y la actualización de pesos por *Backpropagation*.
 
----
+### Matriz de Seguimiento (SMART)
 
-## 5. Fundamentos Matemáticos y Arquitectura de la Red
-
-### Formulación Matemática
-Cada neurona en la red calcula la combinación lineal de las entradas seguida de una transformación no lineal:
-* **Combinación lineal:** $z = \sum_{i=1}^{n} (w_i \cdot x_i) + b = w^T x + b$
-* **Activación:** $a = f(z)$
-
-### Arquitectura Seleccionada (Perceptrón Multicapa)
-* **Capa de Entrada:** 4 neuronas (correspondientes a las 4 variables de entrada $X$).
-* **Capa Oculta 1:** 8 neuronas con activación **ReLU**.
-* **Capa Oculta 2:** 4 neuronas con activación **ReLU**.
-* **Capa de Salida:** 1 neurona con activación **Sigmoid** (salida probabilística entre 0 y 1).
+| Fase | Evidencia | Indicador | Meta | Fecha / Horizonte |
+| :--- | :--- | :--- | :--- | :--- |
+| **Problema** | `README.md` | Formulación completa y matriz comparativa | 100% documentado | Semana 1 |
+| **Datos** | `notebooks/01_datos.ipynb` / `02_quality.ipynb` | Tratamiento de nulos, outliers y escalamiento | 0% faltantes, $X \in [0,1]$ | Semana 2 |
+| **Arquitectura** | `notebooks/04_architecture.ipynb` | Diagrama y compatibilidad de tensores | Verificación exitosa | Semana 3 |
+| **Modelo** | `notebooks/06_training.ipynb` | Descenso de la pérdida (*Loss*) en entrenamiento | Convergencia de curva | Semana 4 |
 
 ---
 
-## 6. Configuración del Aprendizaje y Optimización
+## 3. Datos y Variables de Entrada
 
-* **Función de Activación Oculta (ReLU):** $f(z) = \max(0, z)$. Evita la saturación del gradiente en capas profundas y acelera la convergencia.
-* **Función de Activación de Salida (Sigmoid):** $f(z) = \frac{1}{1 + e^{-z}}$. Mapea la salida en la escala continua $[0, 1]$ para interpretar la predicción como probabilidad.
-* **Función de Pérdida (Loss):** **Binary Cross-Entropy (BCE)**.
-  $$\mathcal{L}(y, \hat{y}) = - \Big[ y \log(\hat{y}) + (1 - y) \log(1 - \hat{y}) \Big]$$
-  Penaliza de forma estricta las predicciones confiables pero erróneas.
-* **Algoritmo de Optimización:** **Adam** (Adaptive Moment Estimation).
-  Ajusta dinámicamente la tasa de aprendizaje por cada peso basándose en los momentos de primer y segundo orden del gradiente.
-* **Hiperparámetros Iniciales:**
-  * Learning rate ($\eta$): `0.001`
-  * Batch size: `32`
-  * Epochs: `50`
+### Fuentes de Información
+| Fuente | Formato | Frecuencia | Licencia / Acceso | Responsable |
+| :--- | :--- | :--- | :--- | :--- |
+| **Kaggle Credit Risk Dataset** | CSV | Estática | CC0: Public Domain | Equipo de Desarrollo |
+
+### 3.1 Diccionario de Datos
+
+| Variable | Tipo | Descripción | Rango / Clases | Target | Origen | Transformación |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| `person_age` | Entero | Edad del solicitante en años | 20 – 144 | No | Directo | Filtro de outliers (>100) y StandardScale |
+| `person_income` | Continuo | Ingreso anual declarado (USD) | 4,000 – 6,000,000 | No | Directo | Log-transform + MinMaxScaler |
+| `loan_amnt` | Continuo | Monto del préstamo solicitado (USD) | 500 – 35,000 | No | Directo | MinMaxScaler $[0, 1]$ |
+| `loan_int_rate` | Continuo | Tasa de interés asignada (%) | 5.42% – 23.22% | No | Directo | Imputación por mediana + MinMaxScaler |
+| `loan_percent_income` | Continuo | Proporción cuota/ingreso anual | 0.00 – 0.83 | No | Derivado | Validado directo en escala $[0, 1]$ |
+| `cb_person_cred_hist_length` | Entero | Años de historial crediticio | 2 – 30 | No | Directo | MinMaxScaler $[0, 1]$ |
+| `loan_status` | Binario | Estado de pago del crédito | 0 (Cumple), 1 (Default/Mora) | **Sí** | Target | Mantenido como entero binario $\{0, 1\}$ |
+
+### 3.2 Calidad y Gobernanza de Datos
+- [x] **Faltantes:** Imputación de la tasa de interés mediante la mediana estratificada por grado de riesgo.
+- [x] **Outliers:** Eliminación de registros con edad inconsistente (>100 años).
+- [x] **Data Leakage:** División estricta de conjuntos (Train/Test) *antes* de calcular los parámetros de escalamiento (Min/Max).
+- [x] **Desbalance:** Evaluación de la proporción de clases ($\approx 21.8\%$ positivos / default).
 
 ---
 
-## 7. Estructura de la Secuencia de Notebooks
+## 4. Fundamentos Matemáticos de la Neurona
 
-1. `01_datos.ipynb`: Carga y exploración inicial del dataset.
-2. `02_quality.ipynb`: Limpieza, tratamiento de faltantes y escalamiento de datos.
-3. `03_fundamentos.ipynb`: Demostración matemática del cálculo forward de la neurona.
-4. `04_architecture.ipynb`: Definición del modelo en TensorFlow/PyTorch y verificación de dimensiones.
-5. `05_forward.ipynb`: Simulación del paso hacia adelante con tensores de prueba.
-6. `06_training.ipynb`: Ciclo de entrenamiento, compilación y curvas de aprendizaje.
+Formulación para una neurona individual en la red:
+
+| Concepto | Definición / Fórmula | Aplicación en el Proyecto |
+| :--- | :--- | :--- |
+| **Entrada $x$** | $\mathbf{x} = [x_1, x_2, \dots, x_6]^T$ | Vector con las 6 variables financieras escaladas del solicitante. |
+| **Pesos $w$** | $\mathbf{w} = [w_1, w_2, \dots, w_6]^T$ | Importancia o ponderación asignada a cada variable financiera. |
+| **Sesgo $b$** | $b \in \mathbb{R}$ | Umbral de activación independiente de las entradas. |
+| **Combinación lineal** | $z = \mathbf{w}^T \mathbf{x} + b = \sum_{i=1}^{n} (w_i x_i) + b$ | Suma ponderada de perfil del cliente. |
+| **Activación** | $a = f(z)$ | Transformación no lineal de la combinación lineal. |
+| **Salida $\hat{y}$** | $\hat{y} = a^{(L)}$ | Probabilidad predicha de que el cliente caiga en mora ($[0, 1]$). |
+| **Error / Loss** | $\mathcal{L}(y, \hat{y})$ | Métrica de discrepancia entre el estado real $y$ y la predicción $\hat{y}$. |
+
+### 4.1 Ejemplo Numérico Verificable
+Supongamos un cliente con entradas normalizadas $\mathbf{x} = [0.25, 0.40, 0.30, 0.15]$, pesos $\mathbf{w} = [0.80, 1.20, -0.50, 0.60]$ y sesgo $b = -0.10$:
+
+| Entrada ($x_i$) | Peso ($w_i$) | Producto ($x_i \cdot w_i$) | Sesgo ($b$) | Suma $z$ | Activación $f(z)$ (Sigmoid) |
+| :---: | :---: | :---: | :---: | :---: | :---: |
+| $x_1 = 0.25$ | $w_1 = 0.80$ | $0.200$ | — | — | — |
+| $x_2 = 0.40$ | $w_2 = 1.20$ | $0.480$ | — | — | — |
+| $x_3 = 0.30$ | $w_3 = -0.50$ | $-0.150$ | — | — | — |
+| $x_4 = 0.15$ | $w_4 = 0.60$ | $0.090$ | — | — | — |
+| **Total** | — | **$\sum = 0.620$** | **$-0.100$** | **$z = 0.520$** | $\sigma(0.520) = \frac{1}{1 + e^{-0.520}} \approx \mathbf{0.6271}$ |
+
+---
+
+## 5. Funciones de Activación
+
+| Función | Fórmula | Rango | Ventaja | Limitación | Uso en el Proyecto |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Sigmoid** | $\sigma(z) = \frac{1}{1 + e^{-z}}$ | $(0, 1)$ | Mapea la salida directamente a una probabilidad. | Sufre de gradiente desvaneciente en valores extremos. | **Capa de Salida** |
+| **Tanh** | $\tanh(z) = \frac{e^z - e^{-z}}{e^z + e^{-z}}$ | $(-1, 1)$ | Centrada en cero, facilita la convergencia frente a sigmoid. | Mantiene problema de gradiente desvaneciente. | No utilizada |
+| **ReLU** | $f(z) = \max(0, z)$ | $[0, \infty)$ | Computacionalmente eficiente, no se satura para $z > 0$. | "Dying ReLU" si $z < 0$ constantemente. | **Capas Ocultas** |
+| **Leaky ReLU** | $f(z) = \max(\alpha z, z)$ | $(-\infty, \infty)$ | Evita el problema de neuronas muertas activando con $\alpha = 0.01$. | Requiere ajustar el hiperparámetro $\alpha$. | Alternativa experimental |
+| **Softmax** | $\sigma(\mathbf{z})_i = \frac{e^{z_i}}{\sum e^{z_j}}$ | $[0, 1]$ | Genera una distribución de probabilidad mult
