@@ -1,13 +1,13 @@
 # Predicción de Riesgo Crediticio mediante Redes Neuronales (MLP)
 
-**Presentado por:**  
+**Presentado por:** 
+---
+
 Yenifer Salazar Restrepo
 
 Juan Esteban Cardona
 
 Camilo Andrés Estrada Sosa
-
-1. Descripción del proy
 
 ---
 
