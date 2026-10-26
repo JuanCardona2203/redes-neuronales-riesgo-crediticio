@@ -5,7 +5,7 @@
 | **Estudiante / equipo** | Yenifer Salazar Restrepo - Juan Esteban Cardona Jaramillo - Camilo Andrés Estrada Sosa |
 | **Programa / área** | Ingeniería / Ciencia de Datos / Redes Neuronales |
 | **Proyecto** | Clasificación de Riesgo Crediticio y Predicción de Mora con Perceptrón Multicapa (MLP) |
-| **Docente** | Docente Titular de Redes Neuronales |
+| **Docente** | Feibert Alirio Guzmán Pérez |
 | **Línea / semillero / investigación** | Inteligencia Computacional y Analítica Financiera |
 | **Versión / fecha** | v1.0 — Octubre 2026 |
 | **Repositorio / evidencia** | [GitHub - redes-neuronales-riesgo-crediticio](https://github.com/JuanCardona2203/redes-neuronales-riesgo-crediticio) |
