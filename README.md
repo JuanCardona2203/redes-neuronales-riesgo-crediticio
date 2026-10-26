@@ -129,4 +129,43 @@ Supongamos un cliente con entradas normalizadas $\mathbf{x} = [0.25, 0.40, 0.30,
 | **Tanh** | $\tanh(z) = \frac{e^z - e^{-z}}{e^z + e^{-z}}$ | $(-1, 1)$ | Centrada en cero, facilita la convergencia frente a sigmoid. | Mantiene problema de gradiente desvaneciente. | No utilizada |
 | **ReLU** | $f(z) = \max(0, z)$ | $[0, \infty)$ | Computacionalmente eficiente, no se satura para $z > 0$. | "Dying ReLU" si $z < 0$ constantemente. | **Capas Ocultas** |
 | **Leaky ReLU** | $f(z) = \max(\alpha z, z)$ | $(-\infty, \infty)$ | Evita el problema de neuronas muertas activando con $\alpha = 0.01$. | Requiere ajustar el hiperparámetro $\alpha$. | Alternativa experimental |
-| **Softmax** | $\sigma(\mathbf{z})_i = \frac{e^{z_i}}{\sum e^{z_j}}$ | $[0, 1]$ | Genera una distribución de probabilidad mult
+| **Softmax** | $\sigma(\mathbf{z})_i = \frac{e^{z_i}}{\sum e^{z_j}}$ | $[0, 1]$ | Genera una distribución de probabilidad multiclase. | Ineficiente para problemas estrictamente binarios. | No utilizada |
+
+### 5.1 Selección Justificada de Activaciones
+* **Capas Ocultas (ReLU):** Seleccionada por acelerar la velocidad de convergencia del gradiente y permitir que la red aprenda fronteras complejas sin costo computacional elevado.
+* **Capa de Salida (Sigmoid):** Indispensable para problemas de clasificación binaria, transformando la salida final en una probabilidad acotada en $[0, 1]$.
+
+---
+
+## 6. Arquitectura de la Red (MLP)
+
+| Capa | Tipo | Neuronas | Entrada | Salida | Activación | Propósito |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Entrada** | Input | 6 | $(N, 6)$ | $(N, 6)$ | Ninguna | Recibir las 6 variables financieras escaladas. |
+| **Oculta 1** | Dense | 16 | $(N, 6)$ | $(N, 16)$ | ReLU | Extraer patrones de interacción primaria. |
+| **Oculta 2** | Dense | 8 | $(N, 16)$ | $(N, 8)$ | ReLU | Condensar representaciones no lineales secundarias. |
+| **Salida** | Dense | 1 | $(N, 8)$ | $(N, 1)$ | Sigmoid | Generar probabilidad final de mora crediticia. |
+
+### 6.1 Familias de Redes Analizadas
+* **Perceptrón de una capa:** Limitado a separabilidad lineal (insuficiente para riesgo bancario).
+* **MLP (Perceptrón Multicapa):** **Seleccionado.** Ideal para datos tabulares estructurados con variables cuantitativas.
+* **CNN / RNN / LSTM:** No aplican debido a que no estamos procesando imágenes ni series temporales secuenciales explícitas.
+
+### 6.2 Diagrama de Flujo Arquitectónico
+```text
+[Entradas: 6 variables] 
+         │
+         ▼
+ ┌──────────────┐
+ │ Capa Oculta 1│  (16 Neuronas + Activation ReLU)
+ └───────┬──────┘
+         │
+         ▼
+ ┌──────────────┐
+ │ Capa Oculta 2│  (8 Neuronas + Activation ReLU)
+ └───────┬──────┘
+         │
+         ▼
+ ┌──────────────┐
+ │ Capa Salida  │  (1 Neurona + Activation Sigmoid) ──► Output: P(Mora) ∈ [0, 1]
+ └──────────────┘
