@@ -169,3 +169,70 @@ Supongamos un cliente con entradas normalizadas $\mathbf{x} = [0.25, 0.40, 0.30,
  ┌──────────────┐
  │ Capa Salida  │  (1 Neurona + Activation Sigmoid) ──► Output: P(Mora) ∈ [0, 1]
  └──────────────┘
+
+## 7. Forward Propagation (Paso Hacia Adelante)
+
+| Paso | Operación Matemática | Entrada | Parámetros / Dimensiones | Activación | Salida / Dimensión |
+| :---: | :--- | :---: | :---: | :---: | :---: |
+| **1** | $z^{(1)} = X W^{(1)} + b^{(1)}$ | $X \in \mathbb{R}^{B \times 6}$ | $W^{(1)} \in \mathbb{R}^{6 \times 16}, b^{(1)} \in \mathbb{R}^{16}$ | ReLU | $A^{(1)} \in \mathbb{R}^{B \times 16}$ |
+| **2** | $z^{(2)} = A^{(1)} W^{(2)} + b^{(2)}$ | $A^{(1)} \in \mathbb{R}^{B \times 16}$ | $W^{(2)} \in \mathbb{R}^{16 \times 8}, b^{(2)} \in \mathbb{R}^{8}$ | ReLU | $A^{(2)} \in \mathbb{R}^{B \times 8}$ |
+| **3** | $z^{(3)} = A^{(2)} W^{(3)} + b^{(3)}$ | $A^{(2)} \in \mathbb{R}^{B \times 8}$ | $W^{(3)} \in \mathbb{R}^{8 \times 1}, b^{(3)} \in \mathbb{R}^{1}$ | Sigmoid | $\hat{Y} \in \mathbb{R}^{B \times 1}$ |
+
+### 7.1 Verificación Dimensional
+Se verifica que el producto de matrices mantenga consistencia dimensional para un tamaño de lote (batch size) de $B = 32$:
+* **Capa Oculta 1:** $(32 \times 6) \cdot (6 \times 16) + (16) \implies (32 \times 16)$
+* **Capa Oculta 2:** $(32 \times 16) \cdot (16 \times 8) + (8) \implies (32 \times 8)$
+* **Capa de Salida:** $(32 \times 8) \cdot (8 \times 1) + (1) \implies (32 \times 1)$
+
+---
+
+## 8. Función de Pérdida (Loss)
+
+| Tarea | Función Candidata | Fórmula | Supuesto | ¿Se Utiliza? |
+| :--- | :--- | :--- | :--- | :---: |
+| **Clasificación Binaria** | **Binary Cross-Entropy (BCE)** | $\mathcal{L} = - [y \log(\hat{y}) + (1-y) \log(1-\hat{y})]$ | Target $y \in \{0, 1\}$, salida $\hat{y} \in (0, 1)$. | **Sí** |
+| **Regresión** | Mean Squared Error (MSE) | $\mathcal{L} = \frac{1}{2} (y - \hat{y})^2$ | Salidas continuas no acotadas. | No |
+| **Multiclase** | Categorical Cross-Entropy | $\mathcal{L} = -\sum y_i \log(\hat{y}_i)$ | Mutuamente excluyente con $K > 2$ clases. | No |
+
+### 8.1 Interpretación del Error
+La función Binary Cross-Entropy penaliza fuertemente a la red cuando realiza predicciones seguras pero incorrectas (por ejemplo, asignar $\hat{y} = 0.99$ cuando la etiqueta real es $y = 0$). Una disminución continua en el valor del error (*loss*) indica que las probabilidades asignadas a la clase correcta aumentan progresivamente durante el entrenamiento.
+
+---
+
+## 9. Backpropagation y Aprendizaje
+
+| Concepto | Descripción / Ecuación | Registro en el Proyecto |
+| :--- | :--- | :--- |
+| **Loss General** | $J(W, b) = \frac{1}{B} \sum_{i=1}^{B} \mathcal{L}(y^{(i)}, \hat{y}^{(i)})$ | Promedio del error en el batch actual. |
+| **Gradiente** | $\nabla_{W} J = \frac{\partial J}{\partial W}$ | Vector de derivadas parciales que indica la dirección de máximo crecimiento del error. |
+| **Regla de actualización** | $W \leftarrow W - \eta \frac{\partial J}{\partial W}$ | Ajuste de pesos en la dirección opuesta al gradiente. |
+| **Learning Rate ($\eta$)** | $\eta = 0.001$ | Magnitud del paso en cada actualización de parámetros. |
+| **Epoch** | 1 pasada completa sobre el conjunto de entrenamiento | Configurado inicialmente a 50 épocas. |
+| **Batch Size** | Subconjunto de datos procesado simultáneamente | Configurado a 32 muestras. |
+
+### 9.1 Cadena de Derivadas (Regla de la Cadena)
+Para actualizar los pesos de la capa de salida $W^{(3)}$:
+$$\frac{\partial J}{\partial W^{(3)}} = \frac{\partial J}{\partial \hat{Y}} \cdot \frac{\partial \hat{Y}}{\partial z^{(3)}} \cdot \frac{\partial z^{(3)}}{\partial W^{(3)}}$$
+
+Para la combinación de Binary Cross-Entropy y activación Sigmoid, la derivada simplificada del error respecto a la entrada lineal de la última capa es:
+$$\frac{\partial J}{\partial z^{(3)}} = \hat{Y} - Y$$
+
+---
+
+## 10. Algoritmo de Optimización e Hiperparámetros
+
+| Optimizador | Idea Clave | Ventaja | Limitación | ¿Se Prueba? |
+| :--- | :--- | :--- | :--- | :---: |
+| **Gradient Descent** | Actualización usando todo el dataset a la vez. | Estable y exacto. | Lento e inviable en datasets grandes. | No |
+| **SGD** | Actualización muestra por muestra o minibatch. | Rápido, escapa de mínimos locales. | Alta oscilación durante el descenso. | No |
+| **Adam** | Combina Momentum con RMSProp (Momentos adaptativos $m_t$ y $v_t$). | Robusto, rápido, ajusta la tasa por parámetro. | Puede requerir weight decay para prevenir sobreajuste. | **Sí (Principal)** |
+
+### 10.1 Configuración de Hiperparámetros
+
+| Parámetro | Valor Inicial | Rango / Alternativas | Justificación Técnica |
+| :--- | :---: | :---: | :--- |
+| **Learning Rate ($\eta$)** | `0.001` | $[0.0001, 0.01]$ | Tasa estándar para Adam que asegura estabilidad inicial. |
+| **Batch Size** | `32` | $[16, 64]$ | Balance óptimo entre velocidad de ejecución y estabilidad de gradientes. |
+| **Epochs** | `50` | $[30, 100]$ | Cantidad suficiente para observar la convergencia del error. |
+| **Betas ($\beta_1, \beta_2$)** | `(0.9, 0.999)` | Valores estándar de Adam | Estimación de primer y segundo momento de los gradientes. |
+| **Seed (Semilla)** | `42` | Fijo | Garantiza la reproducibilidad exacta de los experimentos. |
