@@ -218,3 +218,15 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# --- Proyecto Riesgo Crediticio ---
+# Datos generados/descargados (no versionar, se regeneran con 01 y 02)
+data/
+notebooks/data/
+
+# Modelos serializados (se regeneran al entrenar)
+models/
+*.pt
+*.pth
+*.pkl
+*.joblib

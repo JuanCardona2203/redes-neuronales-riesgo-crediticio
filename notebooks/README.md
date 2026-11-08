@@ -10,3 +10,7 @@ Esta carpeta contiene la secuencia ordenada de notebooks para la preparación de
 | `04_architecture.ipynb` | Declaración de la estructura Keras/PyTorch (Capa de entrada, ocultas y salida). |
 | `05_forward.ipynb` | Verificación de compatibilidad de dimensiones de los tensores durante la inferencia. |
 | `06_training.ipynb` | Entrenamiento del MLP con Binary Cross-Entropy y optimizador Adam. |
+| `07_regularization.ipynb` | Regularización (Dropout, weight decay, early stopping) y cuaderno de experimentos. |
+| `08_evaluation.ipynb` | Evaluación en Test: métricas, matriz de confusión, curva ROC y comparación con baseline. |
+| `09_interpretation.ipynb` | Interpretación (XAI): importancia de variables mediante permutation importance. |
+| `10_deployment.ipynb` | Despliegue: flujo de inferencia con casos de prueba (válido, límite, inválido, error). |

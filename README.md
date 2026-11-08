@@ -9,7 +9,7 @@
 | **Línea / semillero / investigación** | Inteligencia Computacional y Analítica Financiera |
 | **Versión / fecha** | v1.0 — Octubre 2026 |
 | **Repositorio / evidencia** | [GitHub - redes-neuronales-riesgo-crediticio](https://github.com/JuanCardona2203/redes-neuronales-riesgo-crediticio) |
-| **Estado** | Implementación / Validación (Fases 1 a 10) |
+| **Estado** | Final (Fases 1 a 28) |
 
 ---
 
@@ -237,3 +237,211 @@ $$\frac{\partial J}{\partial z^{(3)}} = \hat{Y} - Y$$
 | **Epochs** | `50` | $[30, 100]$ | Cantidad suficiente para observar la convergencia del error. |
 | **Betas ($\beta_1, \beta_2$)** | `(0.9, 0.999)` | Valores estándar de Adam | Estimación de primer y segundo momento de los gradientes. |
 | **Seed (Semilla)** | `42` | Fijo | Garantiza la reproducibilidad exacta de los experimentos. |
+
+---
+
+## 11. Entrenamiento y Validación
+
+Evidencia: `notebooks/06_training.ipynb`
+
+El modelo se entrena sobre los datos escalados generados en `02_quality.ipynb`. El conjunto de entrenamiento se divide internamente en Train/Validación (80/20, estratificado), reservando el conjunto de Test para la evaluación final.
+
+| Parámetro | Valor | Justificación |
+| :--- | :--- | :--- |
+| **Train/Validación** | 80% / 20% | División estratificada manteniendo la proporción de clases. |
+| **Test** | Reservado | No se usa en entrenamiento; se evalúa en la Sección 14. |
+| **Seed** | `42` | Reproducibilidad exacta. |
+| **Función de pérdida** | Binary Cross-Entropy | Clasificación binaria con salida Sigmoid. |
+| **Optimizador** | Adam (lr=0.001) | Momentos adaptativos. |
+| **Guardado** | `models/mlp_credit_risk.pt` | Pesos del modelo entrenado. |
+
+**Resultado:** la pérdida desciende de forma estable (train ≈ 0.39 → 0.36; validación ≈ 0.39 → 0.36), confirmando que la red aprende. Las curvas de train y validación descienden juntas, sin señales de sobreajuste.
+
+---
+
+## 12. Regularización y Generalización
+
+Evidencia: `notebooks/07_regularization.ipynb`
+
+| Técnica | Problema que aborda | Aplicación | Resultado |
+| :--- | :--- | :--- | :--- |
+| **Dropout** | Sobreajuste | Capas ocultas (0.3 / 0.5) | No mejora: el modelo base no sobreajusta. |
+| **Weight decay (L2)** | Sobreajuste | Adam (`weight_decay` 1e-4 / 1e-3) | Incrementa ligeramente la pérdida. |
+| **Early stopping** | Sobreajuste | Monitoreo de val_loss (patience=5) | Sin efecto relevante. |
+
+**Conclusión:** como las curvas de entrenamiento y validación ya convergen juntas, no existe sobreajuste que corregir. Las técnicas de regularización se evalúan y se documentan como alternativas descartadas con evidencia, conservando la arquitectura base.
+
+---
+
+## 13. Cuaderno de Experimentos
+
+Evidencia: `notebooks/07_regularization.ipynb` · `notebooks/reports/experimentos.csv` · `docs/EXPERIMENTOS.md`
+
+Experimentos controlados (semilla y validación fijas). Métrica: pérdida de validación (BCE) final.
+
+| ID | Cambio | Val Loss (BCE) | Decisión |
+| :--- | :--- | :---: | :--- |
+| **EXP-01** | Baseline MLP (6-16-8-1) | **0.3583** | **Seleccionado** |
+| EXP-07 | Batch size 16 | 0.3604 | Descartado |
+| EXP-08 | Early stopping (patience=5) | 0.3619 | Descartado |
+| EXP-02 | Dropout 0.3 | 0.3624 | Descartado |
+| EXP-06 | Dropout 0.3 + WD 1e-4 | 0.3626 | Descartado |
+| EXP-04 | Weight decay 1e-4 | 0.3684 | Descartado |
+| EXP-05 | Weight decay 1e-3 | 0.3697 | Descartado |
+| EXP-03 | Dropout 0.5 | 0.3841 | Descartado |
+
+---
+
+## 14. Evaluación y Análisis de Errores
+
+Evidencia: `notebooks/08_evaluation.ipynb` · `notebooks/reports/comparacion_modelos.csv`
+
+Métricas del MLP sobre el conjunto de Test reservado (6.516 muestras):
+
+| Métrica | Valor | Interpretación |
+| :--- | :---: | :--- |
+| **Accuracy** | 0.843 | Aciertos globales. |
+| **Precision** | 0.671 | De los clientes marcados como mora, cuántos lo son realmente. |
+| **Recall** | 0.548 | De los morosos reales, cuántos detecta el modelo. |
+| **F1** | 0.603 | Equilibrio entre precision y recall. |
+| **ROC-AUC** | 0.851 | Capacidad de separar las clases. |
+
+### 14.1 Matriz de Confusión
+
+| | Predicho Cumple | Predicho Mora |
+| :--- | :---: | :---: |
+| **Real Cumple** | 4712 (TN) | 382 (FP) |
+| **Real Mora** | 643 (FN) | 779 (TP) |
+
+| Error | Cantidad | Impacto en el negocio |
+| :--- | :---: | :--- |
+| **Falsos Positivos** | 382 | Clientes solventes rechazados (pérdida de negocio). |
+| **Falsos Negativos** | 643 | Morosos aprobados (pérdida de capital). Principal punto a mejorar. |
+
+El Recall moderado refleja el desbalance de clases (~21.8% de mora): el modelo aún deja pasar casi la mitad de los morosos, lo que se documenta como limitación.
+
+---
+
+## 16. Comparación de Redes y Selección Técnica
+
+Evidencia: `notebooks/08_evaluation.ipynb`
+
+| Modelo | Accuracy | Precision | Recall | F1 | ROC-AUC |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| Regresión Logística (baseline) | 0.831 | 0.698 | 0.398 | 0.507 | 0.827 |
+| **MLP (Red Neuronal)** | **0.843** | 0.671 | **0.548** | **0.603** | **0.851** |
+
+**Selección:** el MLP supera al baseline lineal en Recall (+15 pts), F1 (+10 pts) y ROC-AUC (+2.4 pts). Al detectar más casos de mora real, responde afirmativamente a la pregunta de investigación: la red neuronal clasifica la mora con mayor precisión que el enfoque estadístico lineal convencional.
+
+---
+
+## 15. Interpretación de la Red (XAI)
+
+Evidencia: `notebooks/09_interpretation.ipynb` · `notebooks/reports/importancia_variables.csv`
+
+Se aplica **permutation importance** sobre el Test: se permuta cada variable y se mide la caída del ROC-AUC. Una caída mayor indica mayor importancia para la predicción.
+
+| Variable | Importancia (caída ROC-AUC) | Lectura |
+| :--- | :---: | :--- |
+| `loan_percent_income` | 0.187 | Proporción cuota/ingreso: variable más influyente. |
+| `loan_int_rate` | 0.140 | Tasa de interés asignada: segunda más influyente. |
+| `loan_amnt` | 0.037 | Monto del préstamo. |
+| `person_income` | 0.015 | Ingreso anual. |
+| `person_age` | 0.0002 | Edad: influencia casi nula. |
+| `cb_person_cred_hist_length` | 0.0001 | Historial crediticio: influencia casi nula. |
+
+**Interpretación:** el modelo prioriza el nivel de endeudamiento relativo y la tasa de interés, patrones financieramente coherentes con el riesgo de mora. La edad y la antigüedad del historial resultan poco relevantes.
+
+**Limitación:** la permutation importance mide influencia predictiva, **no causalidad**. Indica qué variables usa la red, no una relación causa-efecto.
+
+---
+
+## 17. Despliegue de la Red Neuronal
+
+Evidencia: `notebooks/10_deployment.ipynb` · `src/predict.py` · `app/app.py`
+
+| Componente | Alternativa elegida | Justificación |
+| :--- | :--- | :--- |
+| **Serialización** | PyTorch (`state_dict`) | Formato nativo del framework usado. |
+| **Inferencia** | `src/predict.py` | Funciones reutilizables de carga y predicción. |
+| **Interfaz** | Streamlit (`app/app.py`) | Demo sencilla para evaluar solicitudes. |
+
+**Flujo de inferencia:** entrada → validación (variables completas y sin nulos) → escalamiento idéntico al entrenamiento (MinMax ajustado solo en Train) → red neuronal → probabilidad de mora → decisión (APROBAR / DENEGAR).
+
+### 17.1 Casos de prueba
+
+| Prueba | Entrada | Resultado | Estado |
+| :--- | :--- | :--- | :---: |
+| Caso válido | Perfil de bajo riesgo | Prob. mora 2.2% → APROBAR | OK |
+| Caso límite | Alto endeudamiento (0.67) y tasa 20% | Prob. mora 99.1% → DENEGAR | OK |
+| Entrada inválida | Falta una variable | Error controlado (ValueError) | OK |
+| Error de inferencia | Valor nulo en una variable | Error controlado (ValueError) | OK |
+
+### 17.2 Ejecución de la demo
+
+```bash
+streamlit run app/app.py
+```
+
+---
+
+## 18. Reproducibilidad y Estructura del Repositorio
+
+```text
+redes-neuronales-riesgo-crediticio/
+├── notebooks/        # 01 a 10: datos, fundamentos, arquitectura, entrenamiento, evaluación, despliegue
+│   └── reports/      # métricas generadas (experimentos, comparación, importancia)
+├── src/              # model.py (arquitectura) y predict.py (inferencia)
+├── models/           # modelo serializado (se genera al entrenar)
+├── app/              # demo Streamlit
+├── docs/             # informe, experimentos, ética, uso de IA, ficha de entrega
+├── presentation/     # diapositivas y video de sustentación
+├── requirements.txt
+├── README.md
+├── .gitignore
+└── LICENSE
+```
+
+### Instalación y ejecución
+
+```bash
+pip install -r requirements.txt
+```
+
+Ejecutar los notebooks `01` a `10` en orden. Los notebooks funcionan tanto en local como en Google Colab (clonan el repositorio si es necesario). La semilla fija (42) garantiza reproducibilidad.
+
+Demo opcional:
+
+```bash
+streamlit run app/app.py
+```
+
+---
+
+## 19. Uso de IA · 20. Ética · 22. Informe
+
+| Documento | Contenido |
+| :--- | :--- |
+| `docs/USO_IA.md` | Registro de prompts y validación humana (§19). |
+| `docs/ETICA.md` | Riesgos, sesgos y mitigaciones (§20). |
+| `docs/INFORME.md` | Informe técnico completo (§22). |
+| `docs/ENTREGA_FINAL.md` | Ficha de entrega final (§28). |
+
+---
+
+## Limitaciones
+
+- **Recall moderado (54.8%):** el modelo deja pasar casi la mitad de los morosos reales, por el desbalance de clases. Es la principal área de mejora.
+- **Prototipo académico:** no está validado para uso en producción real.
+- **Sin causalidad:** la interpretación muestra correlación con la predicción, no causas.
+
+---
+
+## 27. Bibliografía
+
+| Tipo | Fuente |
+| :--- | :--- |
+| Dataset | Credit Risk (Kaggle, licencia CC0: Public Domain). |
+| Framework | PyTorch — biblioteca de aprendizaje profundo. |
+| Algoritmo | Kingma & Ba (2014), *Adam: A Method for Stochastic Optimization*. |
+| Métricas | scikit-learn — métricas de clasificación. |
